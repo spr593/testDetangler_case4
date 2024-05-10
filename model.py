@@ -9,45 +9,46 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-# Define Stack Model learners and estimator
-base_learners = [('knn', KNeighborsClassifier(n_neighbors=5)), ('svc', SVC(kernel='linear'))]
-final_estimator = LogisticRegression()
+class stack_model:
+    def __init__(self,X,y):
+        imputer = SimpleImputer(strategy='mean')  # Replace missing values with the mean of the column
+        scaler = StandardScaler()  # Scale data to have zero mean and unit variance
+        X = imputer.fit_transform(X)
+        X = scaler.fit_transform(X)
 
-# Stacking model pipeline
-stack_model_pipeline = Pipeline([
-    ('imputer', SimpleImputer(strategy='mean')),  # Handle missing values
-    ('scaler', StandardScaler()),  # Scale features
-    ('stacking', StackingClassifier(estimators=base_learners, final_estimator=final_estimator, cv=5))
-])
+        self.X_train, self.X_temp, self.y_train, self.y_temp = train_test_split(X, y, test_size=0.3, random_state=33)
+        self.X_test, self.X_val, self.y_test, self.y_val = train_test_split(self.X_temp, self.y_temp, test_size=0.4, random_state=33)
 
-# Function to train, validate the stacking model
-def train_validate(X_train, X_test, X_val, y_train):
-    stack_model_pipeline.fit(X_train, y_train)
-    validation_predictions = stack_model_pipeline.predict(X_val)
-    return validation_predictions
+        # Define Stack Model learners and estimator
+        base_learners = [('knn', KNeighborsClassifier(n_neighbors=5)), ('svc', SVC(kernel='linear'))]
+        final_estimator = LogisticRegression()
 
-# Function to test the stacking model
-def predict (X_test):
-    test_predictions = stack_model_pipeline.predict(X_test)
-    return test_predictions
+        # Stacking model pipeline
+        self.stack_model_pipeline = Pipeline([
+            ('imputer', SimpleImputer(strategy='mean')),  # Handle missing values
+            ('scaler', StandardScaler()),  # Scale features
+            ('stacking', StackingClassifier(estimators=base_learners, final_estimator=final_estimator, cv=5))
+        ])
 
-def preprocessing(X, y):
-    imputer = SimpleImputer(strategy='mean')  # Replace missing values with the mean of the column
-    scaler = StandardScaler()  # Scale data to have zero mean and unit variance
-    X = imputer.fit_transform(X)
-    X = scaler.fit_transform(X)
+    # Function to train, validate the stacking model
+    def train_validate(self):
+        self.stack_model_pipeline.fit(self.X_train, self.y_train)
+        validation_predictions = self.stack_model_pipeline.predict(self.X_val)
+        return validation_predictions
 
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=33)
-    X_test, X_val, y_test, y_val = train_test_split(X_temp, y_temp, test_size=0.4, random_state=33)
+    # Function to test the stacking model
+    def predict (self):
+        test_predictions = self.stack_model_pipeline.predict(self.X_test)
+        return test_predictions
 
-def model_predictions(X_train, X_test, X_val, y_train, y_test, y_val):
-    validation_predictions = train_validate(X_train, X_test, X_val, y_train)
-    predictions = predict(X_test)
-    test_accuracy = accuracy_score(y_test, predictions)
-    validation_accuracy = accuracy_score(y_val, validation_predictions)
+    def model_predictions(self):
+        validation_predictions = self.train_validate(self.X_train, self.X_test, self.X_val, self.y_train)
+        predictions = self.predict(self.X_test)
+        test_accuracy = accuracy_score(self.y_test, predictions)
+        validation_accuracy = accuracy_score(self.y_val, validation_predictions)
 
-    test_recall = recall_score(y_test, predictions)
-    validation_recall = recall_score(y_val, validation_predictions)
+        test_recall = recall_score(self.y_test, predictions)
+        validation_recall = recall_score(self.y_val, validation_predictions)
 
-    test_f1 = f1_score(y_test, predictions)
-    validation_f1 = f1_score(y_val, validation_predictions)
+        test_f1 = f1_score(self.y_test, predictions)
+        validation_f1 = f1_score(self.y_val, validation_predictions)

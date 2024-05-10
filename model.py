@@ -1,6 +1,7 @@
 from sklearn.base import accuracy_score
 from sklearn.ensemble import StackingClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -44,3 +45,9 @@ def model_predictions(X_train, X_test, X_val, y_train, y_test, y_val):
     predictions = predict(X_test)
     test_accuracy = accuracy_score(y_test, predictions)
     validation_accuracy = accuracy_score(y_val, validation_predictions)
+
+    test_recall = recall_score(y_test, predictions)
+    validation_recall = recall_score(y_val, validation_predictions)
+
+    test_f1 = f1_score(y_test, predictions)
+    validation_f1 = f1_score(y_val, validation_predictions)

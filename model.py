@@ -16,3 +16,14 @@ stack_model_pipeline = Pipeline([
     ('scaler', StandardScaler()),  # Scale features
     ('stacking', StackingClassifier(estimators=base_learners, final_estimator=final_estimator, cv=5))
 ])
+
+# Function to train, validate the stacking model
+def train_validate(X_train, X_test, X_val, y_train):
+    stack_model_pipeline.fit(X_train, y_train)
+    validation_predictions = stack_model_pipeline.predict(X_val)
+    return validation_predictions
+
+# Function to test the stacking model
+def test (X_test):
+    test_predictions = stack_model_pipeline.predict(X_test)
+    return test_predictions

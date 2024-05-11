@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.base import accuracy_score
 from sklearn.ensemble import StackingClassifier
 from sklearn.linear_model import LogisticRegression
@@ -36,6 +37,12 @@ class stack_model:
         validation_predictions = self.stack_model_pipeline.predict(self.X_val)
         return validation_predictions
 
+    def crossfold_train_validate(self):
+        folds = []
+        for i in range(self.K):
+            folds.append(self.train_validate(self))
+        return  np.mean(folds)
+
     # Function to test the stacking model
     def predict (self):
         test_predictions = self.stack_model_pipeline.predict(self.X_test)
@@ -52,3 +59,4 @@ class stack_model:
 
         test_f1 = f1_score(self.y_test, predictions)
         validation_f1 = f1_score(self.y_val, validation_predictions)
+

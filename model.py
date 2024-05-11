@@ -9,6 +9,7 @@ from sklearn.svm import SVC
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+from unittest_model import TestStackingModel
 
 class stack_model:
     def __init__(self,X,y):
@@ -59,4 +60,10 @@ class stack_model:
 
         test_f1 = f1_score(self.y_test, predictions)
         validation_f1 = f1_score(self.y_val, validation_predictions)
+        return validation_predictions, predictions
 
+    def unit_test_model(self):
+        unittest = TestStackingModel(self.model_predictions, self.y_val, self.y_test)
+        vp , p =  self.model_predictions
+        report = unittest.test_model_performance(self, vp,p )
+        print(report)
